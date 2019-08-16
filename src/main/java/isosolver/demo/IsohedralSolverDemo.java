@@ -12,18 +12,21 @@ public class IsohedralSolverDemo {
 	public static void main(String[] args) {
 
 		IsohedralTilingSolver s = new IsohedralTilingSolver(
-				//new int[]{1,1,3,1,1,3,1,1,3,1,1,3}, 4, true // X pentomino in {4,4}
-				new int[]{1,1,2,1,3,1,1,3,1,1,2,3}, 4, true // F pentomino in {4,4}
-				//new int[]{1,1,2,1,3,1,1,3,1,1,2,3}, 4, true, OrientedEdgeType.makePositiveArray(12) // F pentomino in {4,4}, no reflections
-				//new int[]{1,2,3,1,2,3}, 5, true // Straight tetriamond in {3,5}
-				//new int[]{1,2,3,1,2,3}, 4, true // Straight tetriamond in {3,4}
-				//new int[]{1,1,3,1,3,1,2,1,1,3,1,3,1,2}, 12, false // Zigzag hexomino in {4,12}
-				//new int[]{1,1,2,1,3,1,1,3,1,1,2,3}, 16, false // F pentomino in {4,16}
-				//new int[]{1,5,1,2,4,1,2,4,1,3}, 7, true // That one octiamond in {3,7}
-				//new int[]{1,1,2,2,1,2,2,1,1,2,3,2}, 7, true // V pentomino in {4,7}
-				//new int[]{1,1,2,3,1,1,2,1,3,1,1,3}, 7, true // F pentomino in {4,7}
-				//new int[]{1,1,2,1,2,2,2,2,2,2,1,1,2,2,2,2,2,3}, 11, false // L octomino in {4,11} (caution, slow!)
-				//new int[]{1, 2, 4, 4, 1, 3, 1, 3, 3, 2, 3}, 9, true // L octomino in {4,11} (caution, slow!)
+				//new int[]{1,1,3,1,1,3,1,1,3,1,1,3}, 4, true // X pentomino
+				//new int[]{1,1,2,1,3,1,1,3,1,1,2,3}, 4, true // F pentomino
+				//new int[]{1,1,2,1,3,1,1,3,1,1,2,3}, 4, true, OrientedEdgeType.makePositiveArray(12) // F pentomino, no reflections
+				//new int[]{1,2,3,1,2,3}, 5, true // Straight tetriamond
+				//new int[]{1,2,3,1,2,3}, 4, true // Straight tetriamond
+				//new int[]{1,1,3,1,3,1,2,1,1,3,1,3,1,2}, 12, false // Zigzag hexomino
+				//new int[]{1,1,2,1,3,1,1,3,1,1,2,3}, 16, false // F pentomino
+				//new int[]{1,5,1,2,4,1,2,4,1,3}, 7, true // That one octiamond
+				//new int[]{1,1,2,2,1,2,2,1,1,2,3,2}, 7, true // V pentomino
+				//new int[]{1,1,2,3,1,1,2,1,3,1,1,3}, 7, true // F pentomino
+				//new int[]{1,1,2,1,2,2,2,2,2,2,1,1,2,2,2,2,2,3}, 11, false // L octomino
+				//new int[]{1,3,1,4,1,3,1,4}, 7, true // H hexiamond
+				//new int[]{1,3,1,4}, 7, true // Half H hexiamond
+				new int[]{1,1,2,2,1,1,2,2}, 5, true // Straight tromino
+				//new int[]{1,1,2,2}, 5, true // Half straight tromino
 		);
 
 		long startNanos = System.nanoTime();
@@ -32,28 +35,10 @@ public class IsohedralSolverDemo {
 		System.out.println("Time to solve: " + ((endNanos - startNanos) / 1_000_000L) + " ms");
 		System.out.println("Number of solutions: " + s.getSolutionCount());
 
-		if (s.getSolutions() != null && s.getSolutionCount() < 20) {
+		if (s.getSolutions() != null && s.getSolutionCount() < 30) {
 			for (List<IsohedralTilingSolver.Gluing> solution : s.getSolutions()) {
 				solution.stream().map(GlueNotation::new).sorted().forEach(System.out::print);
 				System.out.println();
-			}
-		}
-	}
-
-	private static String getGluingString(IsohedralTilingSolver.Gluing g) {
-		int v1 = g.isFirstEdgeReversed() ? g.firstEdgeFirstVertex() : g.firstEdgeSecondVertex();
-		int v2 = g.isSecondEdgeReversed() ? g.secondEdgeFirstVertex() : g.secondEdgeSecondVertex();
-		if (v1 == v2) {
-			if (g.isFirstEdgeReversed() == g.isSecondEdgeReversed()) {
-				return "(" + v1 + ")";
-			} else {
-				return "[" + v1 + "]";
-			}
-		} else {
-			if (g.isFirstEdgeReversed() == g.isSecondEdgeReversed()) {
-				return "(" + v1 + "," + v2 + ")";
-			} else {
-				return "[" + v1 + "," + v2 + "]";
 			}
 		}
 	}
