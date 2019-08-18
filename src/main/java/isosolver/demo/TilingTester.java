@@ -4,8 +4,10 @@ import isosolver.IsohedralTilingSolver;
 import isosolver.Polyform;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class TilingTester {
 	public static void main(String[] args) {
@@ -21,15 +23,21 @@ public class TilingTester {
 				Polyform.getPolyformName(NUM_POLYGON_SIDES, NUM_POLYGON_TILES, true)
 		));
 
+		Map<Polyform, Integer> solutionCounts = new HashMap<>();
 		List<Polyform> solvingPolyforms = new ArrayList<>();
+		List<Polyform> nonSolvingPolyforms = new ArrayList<>();
 		for (Polyform p : polyformList) {
 			//System.out.println("Searching order-" + TILING_ORDER + " regular tilings using " + p + ":");
 			IsohedralTilingSolver solver = new IsohedralTilingSolver(p.getVertexOrders(), TILING_ORDER, false);
 			solver.solve();
 			//System.out.println("Found " + solver.getSolutionCount() + " solutions");
-			if (solver.getSolutionCount() > 0) {
+			int count = solver.getSolutionCount();
+			if (count > 0) {
 				solvingPolyforms.add(p);
+			} else {
+				nonSolvingPolyforms.add(p);
 			}
+			solutionCounts.put(p, count);
 		}
 		long endNanos = System.nanoTime();
 		System.out.println("Time to test: " + ((endNanos - startNanos) / 1_000_000L) + " ms");
@@ -39,5 +47,17 @@ public class TilingTester {
 				Polyform.getPolyformName(NUM_POLYGON_SIDES, NUM_POLYGON_TILES, solvingPolyforms.size() != 1),
 				NUM_POLYGON_SIDES, TILING_ORDER
 		));
+		if (solvingPolyforms.size() > 0 && solvingPolyforms.size() < 20) {
+			System.out.println("Tiling polyforms:");
+			for (Polyform p : solvingPolyforms) {
+				System.out.println(p + " (" + solutionCounts.get(p) + ")");
+			}
+		}
+		if (nonSolvingPolyforms.size() > 0 && nonSolvingPolyforms.size() < 20) {
+			System.out.println("Non-tiling polyforms:");
+			for (Polyform p : nonSolvingPolyforms) {
+				System.out.println(p + " (" + solutionCounts.get(p) + ")");
+			}
+		}
 	}
 }
