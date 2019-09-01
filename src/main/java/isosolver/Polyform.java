@@ -12,9 +12,9 @@ public class Polyform implements Comparable<Polyform> {
 	final int length;
 
 	public Polyform(int[] vertexOrders) {
-		if (vertexOrders.length < 2) {
-			throw new IllegalArgumentException("Polyform must have at least 2 sides");
-		}
+		//if (vertexOrders.length < 2) {
+		//	throw new IllegalArgumentException("Polyform must have at least 2 sides");
+		//}
 		this.vertexOrders = vertexOrders;
 		this.length = vertexOrders.length;
 	}
@@ -162,7 +162,85 @@ public class Polyform implements Comparable<Polyform> {
 		Collections.sort(ans);
 		return ans;
 	}
-
+	public static List<Polyform> getAllESPolyforms(int polygonSides, int numPolygons) {
+		Set<Polyform> oldPolyforms = new HashSet<Polyform>();
+		Set<Polyform> newPolyforms = new HashSet<Polyform>();
+		int[] BasicES = new int[polygonSides-1];
+		for (int k = 0; k < polygonSides-2; ++k) {
+			BasicES[k] = 1;
+		}
+		BasicES[polygonSides-2] = 2;
+		Polyform BasicESPolyform = new Polyform(BasicES);
+		oldPolyforms.add(BasicESPolyform); // Di-form
+		for (int n = 2; n < numPolygons; n = n+2) {
+			for (Polyform p : oldPolyforms) {
+				for (int i = 0; i < p.length; ++i) {
+					Polyform np = p.addPolygon(polygonSides, i);
+					newPolyforms.add(np.normalize());
+				}
+			}
+			Set<Polyform> swap = newPolyforms;
+			newPolyforms = oldPolyforms;
+			oldPolyforms = swap;
+			newPolyforms.clear();
+		}
+		ArrayList<Polyform> ans = new ArrayList<>(oldPolyforms);
+		Collections.sort(ans);
+		return ans;
+	}
+	public static List<Polyform> getAllCSPolyforms(int polygonSides, int numPolygons, int symmetry) {
+		Set<Polyform> oldPolyforms = new HashSet<Polyform>();
+		Set<Polyform> newPolyforms = new HashSet<Polyform>();
+		int PS = polygonSides/symmetry;
+		int[] BasicCS = new int[PS];
+		for (int k = 0; k < PS-1; ++k) {
+			BasicCS[k] = 1;
+		}
+		Polyform BasicCSPolyform = new Polyform(BasicCS);
+		oldPolyforms.add(BasicCSPolyform); // Mono-form
+		for (int n = 1; n < numPolygons; n = n+symmetry) {
+			for (Polyform p : oldPolyforms) {
+				for (int i = 0; i < p.length; ++i) {
+					Polyform np = p.addPolygon(polygonSides, i);
+					newPolyforms.add(np.normalize());
+				}
+			}
+			Set<Polyform> swap = newPolyforms;
+			newPolyforms = oldPolyforms;
+			oldPolyforms = swap;
+			newPolyforms.clear();
+		}
+		ArrayList<Polyform> ans = new ArrayList<>(oldPolyforms);
+		Collections.sort(ans);
+		return ans;
+	}
+	public static List<Polyform> getAllVSPolyforms(int polygonSides, int numPolygons, int q, int symmetry) {
+		Set<Polyform> oldPolyforms = new HashSet<Polyform>();
+		Set<Polyform> newPolyforms = new HashSet<Polyform>();
+		int QS = q/symmetry;
+		int[] BasicVS = new int[2*QS];
+		for (int k = 0; k < QS; ++k) {
+			BasicVS[2*k] = 1;
+			BasicVS[2*k + 1] = 2;
+		}
+		Polyform BasicVSPolyform = new Polyform(BasicVS);
+		oldPolyforms.add(BasicVSPolyform); // Q-form
+		for (int n = q; n < numPolygons; n = n+symmetry) {
+			for (Polyform p : oldPolyforms) {
+				for (int i = 0; i < p.length; ++i) {
+					Polyform np = p.addPolygon(polygonSides, i);
+					newPolyforms.add(np.normalize());
+				}
+			}
+			Set<Polyform> swap = newPolyforms;
+			newPolyforms = oldPolyforms;
+			oldPolyforms = swap;
+			newPolyforms.clear();
+		}
+		ArrayList<Polyform> ans = new ArrayList<>(oldPolyforms);
+		Collections.sort(ans);
+		return ans;
+	}
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
