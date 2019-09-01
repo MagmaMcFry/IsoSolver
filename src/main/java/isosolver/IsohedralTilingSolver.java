@@ -76,12 +76,12 @@ public class IsohedralTilingSolver {
 			int polygonSize = vertexOrders.length;
 			LinkedEdge[] forwardsEdges = new LinkedEdge[polygonSize];
 			for (int i = 0; i < polygonSize; ++i) {
-				forwardsEdges[i] = new LinkedEdge(offset + i, offset + ((i + 1) % polygonSize), vertexOrders[i], edgeTypes[i], false, sentinel);
+				forwardsEdges[i] = new LinkedEdge(p, i, ((i + 1) % polygonSize), vertexOrders[i], edgeTypes[i], false, sentinel);
 			}
 			for (int i = 0; i < polygonSize; ++i) {
 				forwardsEdges[i].prevEdge = forwardsEdges[(i + polygonSize - 1) % polygonSize];
 				forwardsEdges[i].nextEdge = forwardsEdges[(i + 1) % polygonSize];
-				forwardsEdges[i].reverseEdge = new LinkedEdge(forwardsEdges[i].secondVertex, forwardsEdges[i].firstVertex, forwardsEdges[i].nextEdge.firstVertexOrder, forwardsEdges[i].edgeType.reverse(), true, sentinel);
+				forwardsEdges[i].reverseEdge = new LinkedEdge(p, forwardsEdges[i].secondVertex, forwardsEdges[i].firstVertex, forwardsEdges[i].nextEdge.firstVertexOrder, forwardsEdges[i].edgeType.reverse(), true, sentinel);
 				forwardsEdges[i].reverseEdge.reverseEdge = forwardsEdges[i];
 			}
 			for (int i = 0; i < polygonSize; ++i) {
@@ -324,6 +324,7 @@ public class IsohedralTilingSolver {
 	}
 
 	private class LinkedEdge {
+		final int polygon;
 		final int firstVertex;
 		final int secondVertex;
 		int firstVertexOrder;
@@ -334,6 +335,7 @@ public class IsohedralTilingSolver {
 		LinkedEdge iterPrevEdge, iterNextEdge;
 
 		private LinkedEdge() {
+			this.polygon = -1;
 			this.firstVertex = -1;
 			this.secondVertex = -1;
 			this.firstVertexOrder = TILING_ORDER;
@@ -346,7 +348,8 @@ public class IsohedralTilingSolver {
 			this.iterNextEdge = this;
 		}
 
-		private LinkedEdge(int firstVertex, int secondVertex, int firstVertexOrder, EdgeType edgeType, boolean isReversed, LinkedEdge sentinel) {
+		private LinkedEdge(int polygon, int firstVertex, int secondVertex, int firstVertexOrder, EdgeType edgeType, boolean isReversed, LinkedEdge sentinel) {
+			this.polygon = polygon;
 			this.firstVertex = firstVertex;
 			this.secondVertex = secondVertex;
 			this.firstVertexOrder = firstVertexOrder;
@@ -380,6 +383,14 @@ public class IsohedralTilingSolver {
 		private Gluing(LinkedEdge e1, LinkedEdge e2) {
 			this.e1 = e1;
 			this.e2 = e2;
+		}
+
+		public int firstEdgePolygon() {
+			return e1.polygon;
+		}
+
+		public int secondEdgePolygon() {
+			return e2.polygon;
 		}
 
 		public int firstEdgeFirstVertex() {
