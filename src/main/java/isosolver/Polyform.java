@@ -218,10 +218,12 @@ public class Polyform implements Comparable<Polyform> {
 		Set<Polyform> oldPolyforms = new HashSet<Polyform>();
 		Set<Polyform> newPolyforms = new HashSet<Polyform>();
 		int QS = q/symmetry;
-		int[] BasicVS = new int[2*QS];
+		int[] BasicVS = new int[(polygonSides - 2)*QS];
 		for (int k = 0; k < QS; ++k) {
-			BasicVS[2*k] = 1;
-			BasicVS[2*k + 1] = 2;
+			for (int l = 0; l < polygonSides - 2; ++l) {
+				BasicVS[(polygonSides - 2) * k + l] = 1;
+			}
+			BasicVS[(polygonSides - 2) * (k+1) - 1] = 2;
 		}
 		Polyform BasicVSPolyform = new Polyform(BasicVS);
 		oldPolyforms.add(BasicVSPolyform); // Q-form
