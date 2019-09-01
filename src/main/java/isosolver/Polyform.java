@@ -193,7 +193,7 @@ public class Polyform implements Comparable<Polyform> {
 		Set<Polyform> newPolyforms = new HashSet<Polyform>();
 		int PS = polygonSides/symmetry;
 		int[] BasicCS = new int[PS];
-		for (int k = 0; k < PS-1; ++k) {
+		for (int k = 0; k < PS; ++k) {
 			BasicCS[k] = 1;
 		}
 		Polyform BasicCSPolyform = new Polyform(BasicCS);
