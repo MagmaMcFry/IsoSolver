@@ -28,7 +28,8 @@ public class TilingTester {
 		List<Polyform> nonSolvingPolyforms = new ArrayList<>();
 		for (Polyform p : polyformList) {
 			//System.out.println("Searching order-" + TILING_ORDER + " regular tilings using " + p + ":");
-			IsohedralTilingSolver solver = new IsohedralTilingSolver(p.getVertexOrders(), TILING_ORDER, false);
+			IsohedralTilingSolver solver = new IsohedralTilingSolver(TILING_ORDER, false);
+			solver.addPolyhedron(p.getVertexOrders());
 			solver.solve();
 			//System.out.println("Found " + solver.getSolutionCount() + " solutions");
 			int count = solver.getSolutionCount();
