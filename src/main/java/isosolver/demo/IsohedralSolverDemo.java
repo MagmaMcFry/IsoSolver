@@ -8,10 +8,9 @@ import java.util.List;
 public class IsohedralSolverDemo {
 
 	public static void main(String[] args) {
-
+		System.out.println("Isohedral Solver Demo");
 		IsohedralTilingSolver s = new IsohedralTilingSolver(4, true);
-		s.addPolyhedron(new int[]{3,3,3,1,1,2,1,2,2,1,2,2,1,2,1,1}); // Heptomino with hole
-		s.addPolyhedron(new int[]{1,1,1,1}); // Monomino to fill the hole
+		s.addPolyhedron(new int[]{1,2,1,3,1,1,3,2,1,1,2,2,3,1});
 
 		long startNanos = System.nanoTime();
 		s.solve();
@@ -25,6 +24,7 @@ public class IsohedralSolverDemo {
 				System.out.println();
 			}
 		}
+		System.out.println("Number of steps taken: " + s.getStepCount());
 	}
 
 	private static class GlueNotation implements Comparable<GlueNotation> {
@@ -46,7 +46,7 @@ public class IsohedralSolverDemo {
 				firstEdge = e2;
 				firstPolygon = p2;
 				secondEdge = e1;
-				secondPolygon = p2;
+				secondPolygon = p1;
 			}
 			flip = g.isFirstEdgeReversed() != g.isSecondEdgeReversed();
 		}

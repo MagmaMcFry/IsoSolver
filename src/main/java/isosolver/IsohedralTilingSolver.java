@@ -8,6 +8,8 @@ import java.util.List;
  * Finds isohedral tilings of polyforms in regular grids, using a fast algorithm based on dancing links techniques.
  */
 public class IsohedralTilingSolver {
+	private final static boolean DEBUG = false;
+
 	private final List<EdgeType[]> EDGE_TYPES = new ArrayList<>();
 	private final List<int[]> VERTEX_ORDERS = new ArrayList<>();
 	private final int TILING_ORDER;
@@ -97,13 +99,13 @@ public class IsohedralTilingSolver {
 
 	private void solveStep() {
 		++steps;
-		if (steps % 10_000_000 == 0) {
+		if (DEBUG && (steps % 10_000_000 == 0)) {
 			System.out.println("Steps elapsed: " + steps);
 		}
 		if (sentinel.iterNextEdge == sentinel) {
 			// We glued all edges together
 			++numSolutions;
-			if (numSolutions % 100_000 == 0) {
+			if (DEBUG && (numSolutions % 100_000 == 0)) {
 				System.out.println("Solutions found so far: " + numSolutions);
 			}
 			if (KEEP_SOLUTIONS) {
@@ -126,6 +128,9 @@ public class IsohedralTilingSolver {
 		LinkedEdge firstEdge = bestCandidate;
 		for (LinkedEdge secondEdge = sentinel.iterNextEdge; secondEdge != sentinel; secondEdge = secondEdge.iterNextEdge) {
 			if (mayGlue(firstEdge, secondEdge)) {
+				if (DEBUG) {
+					System.out.println("Gluing " + firstEdge + " to " + secondEdge);
+				}
 				solution.add(new Gluing(firstEdge, secondEdge));
 				if (firstEdge == secondEdge) {
 					glueSelf(firstEdge);
@@ -149,6 +154,9 @@ public class IsohedralTilingSolver {
 					unglue(firstEdge, secondEdge);
 				}
 				solution.remove(solution.size() - 1);
+				if (DEBUG) {
+					System.out.println("Ungluing " + firstEdge + " from " + secondEdge);
+				}
 			}
 		}
 	}
@@ -316,6 +324,10 @@ public class IsohedralTilingSolver {
 
 	public int getSolutionCount() {
 		return numSolutions;
+	}
+
+	public int getStepCount() {
+		return steps;
 	}
 
 	public List<List<Gluing>> getSolutions() {
