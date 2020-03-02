@@ -57,9 +57,9 @@ public class IsohedralTilingSolver2Data {
 	boolean conePointsAllowed = true;
 
 	/**
-	 * Whether to drop disconnected solutions (default: false)
+	 * Whether to discard disconnected solutions (default: true)
 	 */
-	boolean ensureConnectivity = false;
+	boolean ensureConnectivity = true;
 
 	/**
 	 * The internal symmetries of the given edge data, as permutations

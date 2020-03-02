@@ -2,7 +2,6 @@ package isosolver2.demo;
 
 import isosolver.IsohedralTilingSolver;
 import isosolver2.IsohedralTilingSolver2;
-import isosolver2.IsohedralTilingSolver2DataBuilder;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -30,7 +29,7 @@ public class IsohedralSolverComparisonDemo {
 
 	public static void runSolver2(int desiredVertexWeight, int[] polyhedron) {
 		System.out.println("Running Isohedral Solver 2");
-		IsohedralTilingSolver2DataBuilder builder = new IsohedralTilingSolver2DataBuilder(desiredVertexWeight);
+		IsohedralTilingSolver2DataBuilder builder = new IsohedralTilingSolver2DataBuilder(desiredVertexWeight, true);
 		builder.addEdgeCycle(polyhedron);
 		IsohedralTilingSolver2 solver = new IsohedralTilingSolver2(builder.build());
 		long startNanos = System.nanoTime();
