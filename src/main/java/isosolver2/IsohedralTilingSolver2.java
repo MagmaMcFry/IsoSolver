@@ -242,7 +242,7 @@ public class IsohedralTilingSolver2 {
 				} else if (firstEdge == edgeMirrors[firstEdge] || secondEdge == edgeMirrors[secondEdge]) {
 					// Gluing a self-mirrored edge to another
 					// This requires the other edge to be self-mirrored too, otherwise gluing makes no sense
-					if (secondEdge == edgeMirrors[secondEdge] && secondEdge == edgeMirrors[secondEdge]) {
+					if (firstEdge == edgeMirrors[firstEdge] && secondEdge == edgeMirrors[secondEdge]) {
 						boolean glueSuccess = glue(firstEdge, secondEdge);
 						if (glueSuccess) {
 							hide(firstEdge);
