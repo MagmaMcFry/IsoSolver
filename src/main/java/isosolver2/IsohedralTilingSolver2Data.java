@@ -1,5 +1,7 @@
 package isosolver2;
 
+import isosolver2.demo.FormatUtils;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -417,5 +419,20 @@ public class IsohedralTilingSolver2Data {
 			newSolution[symmetry[i]] = symmetry[solution[i]];
 		}
 		return newSolution;
+	}
+
+	public void printDebugInfo() {
+		System.out.println("Tiling data info:");
+		System.out.println("Number of edges: " + numEdges);
+		System.out.println("Desired vertex weight: " + desiredVertexWeight);
+		System.out.println("Right neighbors:     " + FormatUtils.stringifyWide(edgeRightNeighbors));
+		System.out.println("Left neighbors:      " + FormatUtils.stringifyWide(edgeLeftNeighbors));
+		System.out.println("Left vertex weights: " + FormatUtils.stringifyWide(leftVertexWeights));
+		System.out.println("Mirrors:             " + FormatUtils.stringifyWide(edgeMirrors));
+		System.out.println("Edge types:          " + FormatUtils.stringifyWide(edgeTypes));
+		System.out.println("Match types:         " + FormatUtils.stringifyWide(matchTypes));
+		System.out.println("Cone points allowed: " + conePointsAllowed);
+		System.out.println("Connectivity required: " + ensureConnectivity);
+		System.out.println();
 	}
 }

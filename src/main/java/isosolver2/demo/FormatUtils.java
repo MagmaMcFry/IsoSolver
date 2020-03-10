@@ -1,6 +1,7 @@
 package isosolver2.demo;
 
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class FormatUtils {
@@ -56,6 +57,12 @@ public class FormatUtils {
 
 	public static String stringify(int[] array) {
 		return "[" + Arrays.stream(array).mapToObj(String::valueOf).collect(Collectors.joining(",")) + "]";
+	}
+
+	public static String stringifyWide(int[] array) {
+		return "[" + Arrays.stream(array)
+				.mapToObj(i -> String.format(Locale.ROOT, "%2d", i))
+				.collect(Collectors.joining(",")) + "]";
 	}
 
 }

@@ -16,6 +16,7 @@ public class MirrorSymmetryDemo {
 		data.setLeftVertexWeights(new int[]{2, 1, 2, 1, 1, 1, 1, 1, 1, 1});
 		data.setEdgeTypeSimple();
 		data.setEnsureConnectivity(true);
+		data.printDebugInfo();
 		IsohedralTilingSolver2 solver = new IsohedralTilingSolver2(data);
 
 		List<int[]> solutions = solver.findAllSolutions();
