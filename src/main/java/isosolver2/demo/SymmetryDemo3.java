@@ -19,7 +19,7 @@ public class SymmetryDemo3 {
         symmetryThree.createAllSymmetryCycles(vertexWeight);
 
         SymmetryCombiner combinedSymmetry = new SymmetryCombiner();
-        combinedSymmetry.combineList3(symmetryOne, symmetryTwo, symmetryThree, vertexWeight);
+        combinedSymmetry.combineLists(vertexWeight, symmetryOne, symmetryTwo, symmetryThree);
         combinedSymmetry.solveCombinations(vertexWeight);
     }
 }

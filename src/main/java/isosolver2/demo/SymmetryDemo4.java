@@ -22,7 +22,7 @@ public class SymmetryDemo4 {
         symmetryFour.createAllSymmetryCycles(vertexWeight);
 
         SymmetryCombiner combinedSymmetry = new SymmetryCombiner();
-        combinedSymmetry.combineList4(symmetryOne, symmetryTwo, symmetryThree, symmetryFour, vertexWeight);
+        combinedSymmetry.combineLists(vertexWeight, symmetryOne, symmetryTwo, symmetryThree, symmetryFour);
         combinedSymmetry.solveCombinations(vertexWeight);
     }
 }
