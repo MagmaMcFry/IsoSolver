@@ -8,9 +8,10 @@ import java.util.List;
  * Finds isohedral tilings of polyforms in regular grids, using a fast algorithm based on dancing links techniques.
  */
 public class IsohedralTilingSolver {
-	private final int VERTEX_COUNT;
-	private final EdgeType[] EDGE_TYPES;
-	private final int[] VERTEX_ORDERS;
+	private final static boolean DEBUG = false;
+
+	private final List<EdgeType[]> EDGE_TYPES = new ArrayList<>();
+	private final List<int[]> VERTEX_ORDERS = new ArrayList<>();
 	private final int TILING_ORDER;
 	private final boolean KEEP_SOLUTIONS;
 	private int steps;
@@ -28,32 +29,33 @@ public class IsohedralTilingSolver {
 		Arrays.fill(types, TrivialEdgeType.EDGE);
 		return types;
 	}
-
 	/**
-	 * @param vertexOrders The interior angle at each interior vertex, measured in elementary polygons.
 	 * @param tilingOrder The number of elementary polygons desired around each point of the completed tiling.
 	 * @param keepSolutions Whether to store solutions in memory. If this is false, solutions are only counted.
 	 */
-	public IsohedralTilingSolver(int[] vertexOrders, int tilingOrder, boolean keepSolutions) {
-		this(vertexOrders, tilingOrder, keepSolutions, makeTrivialEdgeTypeArray(vertexOrders.length));
+	public IsohedralTilingSolver(int tilingOrder, boolean keepSolutions) {
+		this.TILING_ORDER = tilingOrder;
+		this.KEEP_SOLUTIONS = keepSolutions;
 	}
 
 	/**
 	 * @param vertexOrders The interior angle at each interior vertex, measured in elementary polygons.
-	 * @param tilingOrder The number of elementary polygons desired around each point of the completed tiling.
-	 * @param keepSolutions Whether to store solutions in memory. If this is false, solutions are only counted.
+	 */
+	public void addPolyhedron(int[] vertexOrders) {
+		addPolyhedron(vertexOrders, makeTrivialEdgeTypeArray(vertexOrders.length));
+	}
+
+	/**
+	 * @param vertexOrders The interior angle at each interior vertex, measured in elementary polygons.
 	 * @param edgeTypes (Optional) Edges can be given edge types to specify which edges can be glued to which other edges.
 	 *                  Useful e.g. for semiregular grids. Edge 0 is the edge between vertex 0 and vertex 1.
 	 */
-	public IsohedralTilingSolver(int[] vertexOrders, int tilingOrder, boolean keepSolutions, EdgeType[] edgeTypes) {
+	public void addPolyhedron(int[] vertexOrders, EdgeType[] edgeTypes) {
 		if (edgeTypes.length != vertexOrders.length) {
 			throw new IllegalArgumentException("List of vertex orders must have same length as list of edge types");
 		}
-		this.VERTEX_COUNT = vertexOrders.length;
-		this.EDGE_TYPES = edgeTypes;
-		this.VERTEX_ORDERS = vertexOrders;
-		this.TILING_ORDER = tilingOrder;
-		this.KEEP_SOLUTIONS = keepSolutions;
+		VERTEX_ORDERS.add(vertexOrders);
+		EDGE_TYPES.add(edgeTypes);
 	}
 
 	private LinkedEdge sentinel;
@@ -68,20 +70,27 @@ public class IsohedralTilingSolver {
 
 	public void init() {
 		sentinel = new LinkedEdge();
+		int offset = 0;
 		// Create edges and link them together properly
-		LinkedEdge[] forwardsEdges = new LinkedEdge[VERTEX_COUNT];
-		for (int i = 0; i < VERTEX_COUNT; ++i) {
-			forwardsEdges[i] = new LinkedEdge(i, (i + 1) % VERTEX_COUNT, VERTEX_ORDERS[i], EDGE_TYPES[i], false, sentinel);
-		}
-		for (int i = 0; i < VERTEX_COUNT; ++i) {
-			forwardsEdges[i].prevEdge = forwardsEdges[(i + VERTEX_COUNT - 1) % VERTEX_COUNT];
-			forwardsEdges[i].nextEdge = forwardsEdges[(i + 1) % VERTEX_COUNT];
-			forwardsEdges[i].reverseEdge = new LinkedEdge(forwardsEdges[i].secondVertex, forwardsEdges[i].firstVertex, forwardsEdges[i].nextEdge.firstVertexOrder, forwardsEdges[i].edgeType.reverse(), true, sentinel);
-			forwardsEdges[i].reverseEdge.reverseEdge = forwardsEdges[i];
-		}
-		for (int i = 0; i < VERTEX_COUNT; ++i) {
-			forwardsEdges[i].reverseEdge.nextEdge = forwardsEdges[i].prevEdge.reverseEdge;
-			forwardsEdges[i].reverseEdge.prevEdge = forwardsEdges[i].nextEdge.reverseEdge;
+		for (int p = 0; p < VERTEX_ORDERS.size(); ++p) {
+			int[] vertexOrders = VERTEX_ORDERS.get(p);
+			EdgeType[] edgeTypes = EDGE_TYPES.get(p);
+			int polygonSize = vertexOrders.length;
+			LinkedEdge[] forwardsEdges = new LinkedEdge[polygonSize];
+			for (int i = 0; i < polygonSize; ++i) {
+				forwardsEdges[i] = new LinkedEdge(p, i, ((i + 1) % polygonSize), vertexOrders[i], edgeTypes[i], false, sentinel);
+			}
+			for (int i = 0; i < polygonSize; ++i) {
+				forwardsEdges[i].prevEdge = forwardsEdges[(i + polygonSize - 1) % polygonSize];
+				forwardsEdges[i].nextEdge = forwardsEdges[(i + 1) % polygonSize];
+				forwardsEdges[i].reverseEdge = new LinkedEdge(p, forwardsEdges[i].secondVertex, forwardsEdges[i].firstVertex, forwardsEdges[i].nextEdge.firstVertexOrder, forwardsEdges[i].edgeType.reverse(), true, sentinel);
+				forwardsEdges[i].reverseEdge.reverseEdge = forwardsEdges[i];
+			}
+			for (int i = 0; i < polygonSize; ++i) {
+				forwardsEdges[i].reverseEdge.nextEdge = forwardsEdges[i].prevEdge.reverseEdge;
+				forwardsEdges[i].reverseEdge.prevEdge = forwardsEdges[i].nextEdge.reverseEdge;
+			}
+			offset += polygonSize;
 		}
 		solution = new ArrayList<>();
 		solutions = new ArrayList<>();
@@ -90,13 +99,13 @@ public class IsohedralTilingSolver {
 
 	private void solveStep() {
 		++steps;
-		if (steps % 10_000_000 == 0) {
+		if (DEBUG && (steps % 10_000_000 == 0)) {
 			System.out.println("Steps elapsed: " + steps);
 		}
 		if (sentinel.iterNextEdge == sentinel) {
 			// We glued all edges together
 			++numSolutions;
-			if (numSolutions % 100_000 == 0) {
+			if (DEBUG && (numSolutions % 100_000 == 0)) {
 				System.out.println("Solutions found so far: " + numSolutions);
 			}
 			if (KEEP_SOLUTIONS) {
@@ -119,6 +128,9 @@ public class IsohedralTilingSolver {
 		LinkedEdge firstEdge = bestCandidate;
 		for (LinkedEdge secondEdge = sentinel.iterNextEdge; secondEdge != sentinel; secondEdge = secondEdge.iterNextEdge) {
 			if (mayGlue(firstEdge, secondEdge)) {
+				if (DEBUG) {
+					System.out.println("Gluing " + firstEdge + " to " + secondEdge);
+				}
 				solution.add(new Gluing(firstEdge, secondEdge));
 				if (firstEdge == secondEdge) {
 					glueSelf(firstEdge);
@@ -142,6 +154,9 @@ public class IsohedralTilingSolver {
 					unglue(firstEdge, secondEdge);
 				}
 				solution.remove(solution.size() - 1);
+				if (DEBUG) {
+					System.out.println("Ungluing " + firstEdge + " from " + secondEdge);
+				}
 			}
 		}
 	}
@@ -311,12 +326,17 @@ public class IsohedralTilingSolver {
 		return numSolutions;
 	}
 
+	public int getStepCount() {
+		return steps;
+	}
+
 	public List<List<Gluing>> getSolutions() {
 		if (!KEEP_SOLUTIONS) return null;
 		return solutions;
 	}
 
 	private class LinkedEdge {
+		final int polygon;
 		final int firstVertex;
 		final int secondVertex;
 		int firstVertexOrder;
@@ -327,6 +347,7 @@ public class IsohedralTilingSolver {
 		LinkedEdge iterPrevEdge, iterNextEdge;
 
 		private LinkedEdge() {
+			this.polygon = -1;
 			this.firstVertex = -1;
 			this.secondVertex = -1;
 			this.firstVertexOrder = TILING_ORDER;
@@ -339,7 +360,8 @@ public class IsohedralTilingSolver {
 			this.iterNextEdge = this;
 		}
 
-		private LinkedEdge(int firstVertex, int secondVertex, int firstVertexOrder, EdgeType edgeType, boolean isReversed, LinkedEdge sentinel) {
+		private LinkedEdge(int polygon, int firstVertex, int secondVertex, int firstVertexOrder, EdgeType edgeType, boolean isReversed, LinkedEdge sentinel) {
+			this.polygon = polygon;
 			this.firstVertex = firstVertex;
 			this.secondVertex = secondVertex;
 			this.firstVertexOrder = firstVertexOrder;
@@ -373,6 +395,14 @@ public class IsohedralTilingSolver {
 		private Gluing(LinkedEdge e1, LinkedEdge e2) {
 			this.e1 = e1;
 			this.e2 = e2;
+		}
+
+		public int firstEdgePolygon() {
+			return e1.polygon;
+		}
+
+		public int secondEdgePolygon() {
+			return e2.polygon;
 		}
 
 		public int firstEdgeFirstVertex() {
