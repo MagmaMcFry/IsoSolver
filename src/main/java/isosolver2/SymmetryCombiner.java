@@ -14,6 +14,17 @@ public class SymmetryCombiner {
     int sizeOfList;
     ArrayList<String[]> namespaces = new ArrayList<>();
 
+    public SymmetryCombiner() {}
+
+    public SymmetryCombiner(int vertexWeight, int[]... cycles) {
+        Symmetry[] symmetries = Arrays.stream(cycles).map(cycle -> {
+            Symmetry y = new Symmetry(cycle);
+            y.createAllSymmetryCycles(vertexWeight);
+            return y;
+        }).toArray(Symmetry[]::new);
+        this.combineLists(vertexWeight, symmetries);
+    }
+
     public int getSizeOfList() {
         return sizeOfList;
     }
@@ -97,7 +108,7 @@ public class SymmetryCombiner {
         }
     }
 
-    public void solveCombinations(int vertexWeight) {
+    public void solveCombinations() {
         for (int i = 0; i < getSizeOfList(); i++) {
             String[] names = namespaces.get(i);
 

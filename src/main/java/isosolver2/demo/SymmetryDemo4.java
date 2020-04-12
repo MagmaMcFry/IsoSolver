@@ -23,6 +23,6 @@ public class SymmetryDemo4 {
 
         SymmetryCombiner combinedSymmetry = new SymmetryCombiner();
         combinedSymmetry.combineLists(vertexWeight, symmetryOne, symmetryTwo, symmetryThree, symmetryFour);
-        combinedSymmetry.solveCombinations(vertexWeight);
+        combinedSymmetry.solveCombinations();
     }
 }
